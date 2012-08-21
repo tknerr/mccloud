@@ -20,8 +20,10 @@ module Mccloud
                 unless !File.exists?(full_scriptname)
                   begin
                     self.scp(full_scriptname,"/tmp/bootstrap.sh")
+                  rescue Net::SSH::AuthenticationFailed => ex
+                    raise ::Mccloud::Error, "[#{@name}] - Authentication failed for user #{ex.message}"
                   rescue Exception => ex
-                    raise ::Mccloud::Error, "[#{@name}] - Error uploading file #{full_scriptname}\n"+ex
+                    raise ::Mccloud::Error, "[#{@name}] - Error uploading file #{full_scriptname}\n#{ex}"
                   end
                   env.ui.info "[#{@name}] - Enabling the bootstrap code to run"
                   result=self.ssh("chmod +x /tmp/bootstrap.sh")
